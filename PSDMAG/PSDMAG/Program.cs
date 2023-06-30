@@ -1,7 +1,19 @@
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+
+using PSDMAG.Models;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddRazorPages();
+
+//var settings = builder.Configuration.GetSection("ConnectionStrings").Get<AppSetting>();
+builder.Services.AddOptions();
+builder.Services.Configure<AppSetting>(
+    builder.Configuration.GetSection("ConnectionStrings"));
 
 var app = builder.Build();
 

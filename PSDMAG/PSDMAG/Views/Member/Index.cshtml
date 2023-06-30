@@ -1,0 +1,74 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewData["Title"] = "使用者管理";
+}
+<form>
+    <div class="card-body">
+        <button class="btn-outline-success"> 新增</button>
+        <table id="tb" class="table" style="width:100%">
+
+        </table>
+    </div>
+</form>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+
+<script type="text/javascript" src="https://cdn.datatables.net/1.10.8/js/jquery.dataTables.min.js"></script>
+
+<script type="text/javascript">
+    var oTable;
+        function Reload() {
+            oTable.ajax.reload(null, true);
+        }
+
+        $(function () {
+        var TableOptions = {
+            language: {
+                url: "@Url.Content("~/assets/js/datatables/tw.json")"
+            },
+            //"dom": 'lrtip',
+            //iDisplayLength: 5,//每頁的行數
+            //serverSide: false,//分頁功能開啟，打開lengthChange
+            scrollX: true,
+            searching: false,
+            lengthChange: false,
+            processing: true,
+            serverSide: true,
+            order: [[0, 'asc']],
+            ajax: {
+                type: 'POST',
+                url: '@Url.Content("~/Member/QueryJson")',
+                data: function (d) {
+                    
+                }
+            },
+            columns: [
+                { 'title': 'ID', 'data': 'ID' },
+                { 'title': '姓名', 'data': 'Mname' },
+                { 'title': '密碼', 'data': 'Mpswd' },
+                {
+                    'title': '維護', 'data': '', 'orderable': false, render: function (data, type, row) {
+                            var btnEdit = '<button class="btn btn-sm-block btn-primary ml-1" type="button" name="edit"><i class="ti-pencil"></i> 編輯</button>';
+                            var btnDel = '<button class="btn btn-sm-block btn-danger ml-1" type="button" name="del"><i class="ti-close"></i> 刪除</button>';
+                            return btnEdit + btnDel;
+
+                    }
+                }
+            ]
+        }
+        oTable = $('#tb').DataTable(TableOptions);
+        $('#tb tbody').on('click', 'button', function () {
+            var data = oTable.row($(this).parents('tr')).data();
+            if ($(this).attr('name') == 'edit') {
+                AllergyUpdate(data);
+            }
+            else {
+                AllergyDel(data);
+            }
+        });
+        });
+
+</script>
