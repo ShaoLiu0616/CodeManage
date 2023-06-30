@@ -22,7 +22,7 @@ namespace PSDMAG.Controllers
 
             var MemberService = new MemberService();
             var Result = MemberService.Query(_appSettings.LocalDB);
-            return Content(JsonConvert.SerializeObject(Result), "application/json");
+            return Content(Result, "application/json");
         }
         [HttpPost]
         public IActionResult Insert(MemberActionRequest Request)
@@ -30,7 +30,15 @@ namespace PSDMAG.Controllers
 
             var MemberService = new MemberService();
             var Result = MemberService.Insert(_appSettings.LocalDB, Request);
-            return Content(JsonConvert.SerializeObject(Result), "application/json");
+            return Content(Result, "application/json");
+        }
+        [HttpPost]
+        public IActionResult Update(MemberActionRequest Request)
+        {
+
+            var MemberService = new MemberService();
+            var Result = MemberService.Insert(_appSettings.LocalDB, Request);
+            return Content(Result, "application/json");
         }
     }
 }

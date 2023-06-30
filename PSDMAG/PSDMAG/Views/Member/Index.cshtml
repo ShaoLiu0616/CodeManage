@@ -4,31 +4,107 @@
 @{
     ViewData["Title"] = "使用者管理";
 }
-<form>
+
     <div class="card-body">
-        <button class="btn-outline-success"> 新增</button>
+    <button class="btn-success" onclick="$('#divEdit').show()"> 新增</button>
         <table id="tb" class="table" style="width:100%">
 
         </table>
+    <div class="card" id="divEdit" >
+        <div class="row">
+            <label>ID</label>
+            <input type="text" class="form-control" id="txtID" />
+        </div>
+        <div class="row">
+            <label>姓名</label>
+            <input type="text" class="form-control" id="txtName" />
+        </div>
+        <div class="row">
+            <label>密碼</label>
+            <input type="password" class="form-control" id="txtPwd" />
+            <label>確認密碼</label>
+            <input type="password" class="form-control" id="txtPwd2" />
+        </div>
+        <div class="row">
+            <button class="btn-primary" onclick="Save()"> 存檔</button>
+            <button class="btn-danger" onclick="$('#divEdit').hide()"> 關閉</button>
+        </div>
     </div>
-</form>
+    </div>
+   
+
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
-
-<script type="text/javascript" src="https://cdn.datatables.net/1.10.8/js/jquery.dataTables.min.js"></script>
 
 <script type="text/javascript">
     var oTable;
+    var Datatype = 'N';
         function Reload() {
             oTable.ajax.reload(null, true);
         }
-
-        $(function () {
-        var TableOptions = {
-            language: {
-                url: "@Url.Content("~/assets/js/datatables/tw.json")"
+    function CheckField() {
+        if ($('#txtID').val().toString().trim() == ''){
+            alert('請輸入ID!');
+            return false;
+        }
+        if ($('#txtName').val().toString().trim() == '') {
+            alert('請輸入姓名!');
+            return false;
+        }
+        if ($('#txtPwd').val().toString().trim() == '') {
+            alert('請輸入密碼!');
+            return false;
+            
+        }
+        else {
+            if ($('#txtPwd').val().toString().trim() != $('#txtPwd2').val().toString().trim()) {
+                alert('密碼與確認密碼不符!');
+                return false;
+            }
+        }
+        return true;
+    }
+    function Save() {
+        if(CheckField()){
+        var url ="";
+        if (Datatype=='N'){
+            url = '@Url.Content("~/Member/Insert")';
+        }else{
+            url = '@Url.Content("~/Member/Update")';
+        }
+        var rowdata = {};
+        rowdata.ID = $('#txtID').val();
+        rowdata.Mname = $('#txtName').val(); //新增
+        rowdata.Mpswd = $('#txtPwd').val();
+        $.ajax({
+            url: url,
+            type: 'POST',
+            dataType: 'json',
+            data: rowdata,
+            async: false,
+            cache: false,
+            success: function (data) {
+                alert(data.Alert, '訊息', function () {
+                    Reload();
+                    $('#txtID').val('');
+                    $('#txtName').val(''); //新增
+                    $('#txtPwd').val('');
+                    $('#txtPwd2').val('');
+                    $('#divEdit').hide();
+                });
             },
+            complete: function (data) {
+
+            }
+        });
+        }
+    }
+        $(function () {
+        $('#divEdit').hide();
+        var TableOptions = {
+            //language: {
+            //    url: "@Url.Content("~/assets/js/datatables/tw.json")"
+            //},
             //"dom": 'lrtip',
             //iDisplayLength: 5,//每頁的行數
             //serverSide: false,//分頁功能開啟，打開lengthChange
@@ -41,9 +117,6 @@
             ajax: {
                 type: 'POST',
                 url: '@Url.Content("~/Member/QueryJson")',
-                data: function (d) {
-                    
-                }
             },
             columns: [
                 { 'title': 'ID', 'data': 'ID' },
@@ -56,19 +129,29 @@
                             return btnEdit + btnDel;
 
                     }
+               
                 }
             ]
         }
+
         oTable = $('#tb').DataTable(TableOptions);
         $('#tb tbody').on('click', 'button', function () {
             var data = oTable.row($(this).parents('tr')).data();
             if ($(this).attr('name') == 'edit') {
-                AllergyUpdate(data);
+                Update(data);
             }
             else {
-                AllergyDel(data);
+                Del(data);
             }
         });
         });
-
+    function Update(item) {
+        $('#divEdit').show();
+        Datatype = 'E'
+        $('#txtID').val(item.ID);
+        $('#txtName').val(item.Mname); 
+    }
+    function Del(item) {
+        Datatype = 'D'
+    }
 </script>
