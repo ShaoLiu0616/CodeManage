@@ -37,7 +37,31 @@ namespace PSDMAG.Controllers
         {
 
             var MemberService = new MemberService();
-            var Result = MemberService.Insert(_appSettings.LocalDB, Request);
+            var Result = MemberService.Update(_appSettings.LocalDB, Request);
+            return Content(Result, "application/json");
+        }
+        [HttpPost]
+        public IActionResult Delete(MemberActionRequest Request)
+        {
+
+            var MemberService = new MemberService();
+            var Result = MemberService.Delete(_appSettings.LocalDB, Request);
+            return Content(Result, "application/json");
+        }
+        [HttpPost]
+        public IActionResult GetMem()
+        {
+
+            var MemberService = new MemberService();
+            var Result = MemberService.GetMem(_appSettings.LocalDB);
+            return Content(Result, "application/json");
+        }
+        [HttpPost]
+        public IActionResult CheckMem(MemberActionRequest Request)
+        {
+
+            var MemberService = new MemberService();
+            var Result = MemberService.CheckMem(_appSettings.LocalDB , Request);
             return Content(Result, "application/json");
         }
     }

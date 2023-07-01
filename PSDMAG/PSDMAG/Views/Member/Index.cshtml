@@ -10,27 +10,29 @@
         <table id="tb" class="table" style="width:100%">
 
         </table>
+</div>
     <div class="card" id="divEdit" >
-        <div class="row">
+    <label style="font-style:inherit">編輯</label>
+        <div class="row col-6 m-2">
             <label>ID</label>
             <input type="text" class="form-control" id="txtID" />
         </div>
-        <div class="row">
+    <div class="row col-6 m-2">
             <label>姓名</label>
             <input type="text" class="form-control" id="txtName" />
         </div>
-        <div class="row">
+    <div class="row col-6 m-2">
             <label>密碼</label>
             <input type="password" class="form-control" id="txtPwd" />
             <label>確認密碼</label>
             <input type="password" class="form-control" id="txtPwd2" />
         </div>
-        <div class="row">
+    <div class="row col-6 m-2">
             <button class="btn-primary" onclick="Save()"> 存檔</button>
             <button class="btn-danger" onclick="$('#divEdit').hide()"> 關閉</button>
         </div>
     </div>
-    </div>
+
    
 
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
@@ -65,11 +67,14 @@
         return true;
     }
     function Save() {
+        debugger;
         if(CheckField()){
         var url ="";
-        if (Datatype=='N'){
+        if (Datatype == 'N'){
             url = '@Url.Content("~/Member/Insert")';
-        }else{
+        }
+        else
+        {
             url = '@Url.Content("~/Member/Update")';
         }
         var rowdata = {};
@@ -84,14 +89,13 @@
             async: false,
             cache: false,
             success: function (data) {
-                alert(data.Alert, '訊息', function () {
+                    alert(data.Alert);
                     Reload();
                     $('#txtID').val('');
                     $('#txtName').val(''); //新增
                     $('#txtPwd').val('');
                     $('#txtPwd2').val('');
                     $('#divEdit').hide();
-                });
             },
             complete: function (data) {
 
@@ -112,7 +116,7 @@
             searching: false,
             lengthChange: false,
             processing: true,
-            serverSide: true,
+            serverSide: false,
             order: [[0, 'asc']],
             ajax: {
                 type: 'POST',
@@ -152,6 +156,25 @@
         $('#txtName').val(item.Mname); 
     }
     function Del(item) {
-        Datatype = 'D'
+        $.ajax({
+            url: '@Url.Content("~/Member/Delete")',
+            type: 'POST',
+            dataType: 'json',
+            data: item,
+            async: false,
+            cache: false,
+            success: function (data) {
+                alert(data.Alert);
+                Reload();
+                $('#txtID').val('');
+                $('#txtName').val(''); //新增
+                $('#txtPwd').val('');
+                $('#txtPwd2').val('');
+                $('#divEdit').hide();
+            },
+            complete: function (data) {
+
+            }
+        });
     }
 </script>

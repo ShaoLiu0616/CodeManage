@@ -1,0 +1,254 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewData["Title"] = "帳號管理";
+}
+
+<div class="card-body">
+    <label>使用者帳號及密碼</label>
+    <div class="row">
+        <label>姓名</label>
+        <select class="form-control" id="ddlName" >
+            <option value=""></option>
+        </select>
+    </div>
+    <div class="row" id="divCkpd">
+        <label>密碼</label>
+        <input type="password" class="form-control" id="txtCPwd" />
+    </div>
+    <div class="row mt-1">
+        <button class="btn-success" onclick="CheckMem()" id="btnchk"> 確認</button>
+    </div>
+</div>
+<div class="card-body" id="divMain">
+    <button class="btn-success" onclick="$('#divEdit').show()"> 新增</button>
+    <table id="tb" class="table" style="width:100%">
+    </table>
+</div>
+<div class="card" id="divEdit">
+    <label>編輯</label>
+    <div class="row col-6 m-2">
+        <label>系統名稱</label>
+        <input type="text" class="form-control" id="txtAppName" />
+    
+    
+        <label>帳號</label>
+        <input type="text" class="form-control" id="txtAcc" />
+    
+        <div class="row">
+            <label>密碼</label>
+            <input type="password" class="form-control" id="txtCode" />
+            <label>密碼2</label>
+            <input type="password" class="form-control" id="txtCode2" />
+        </div>
+    </div>
+    <div class="row">
+        <button class="btn-primary col-3" onclick="Save()"> 存檔</button>
+        <button class="btn-danger col-3" onclick="$('#divEdit').hide()"> 關閉</button>
+    </div>
+    <input id="hiddidx" type="hidden" value=""/>
+</div>
+
+
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+<script type="text/javascript">
+    var oTable;
+    var Datatype = 'N';
+    function Reload() {
+        oTable.ajax.reload(null, true);
+    }
+       function GetMem() {
+        $.ajax({
+            url: '@Url.Content("~/Member/GetMem")',
+            type: 'POST',
+            dataType: 'json',
+            data: "",
+            async: false,
+            cache: false,
+            success: function (data) {
+                $.each(data.Data, function (i, item) {
+                    $('#ddlName').append(new Option(item.Mname, item.ID));
+                });
+            },
+            complete: function (data) {
+
+            }
+        });
+    }
+    function CheckMem() {
+        $.ajax({
+            url: '@Url.Content("~/Member/CheckMem")',
+            type: 'POST',
+            dataType: 'json',
+            data: { ID: $("#ddlName").val(), Mpswd: $("#txtCPwd").val() },
+            async: false,
+            cache: false,
+            success: function (data) {
+                alert(data.Alert);
+                if(data.Status == 0){
+                    $('#txtCPwd').val('');
+                    $('#ddlName').attr('disabled' , true);
+                }
+                else {
+                    $('#divMain').show();
+                    $('#txtCPwd').val('');
+                    $('#ddlName').attr('disabled', true);
+                    $('#divCkpd').attr('hidden', true);
+                    $('#btnchk').hide();
+                    Reload();
+                }
+           
+                
+            },
+            complete: function (data) {
+
+            }
+        });
+    }
+    function CheckField() {
+        if ($('#txtAppName').val().toString().trim() == '') {
+            alert('請輸入系統名稱!');
+            return false;
+        }
+        if ($('#txtAcc').val().toString().trim() == '') {
+            alert('請輸入帳號!');
+            return false;
+        }
+        if ($('#txtCode').val().toString().trim() == '') {
+            alert('請輸入密碼!');
+            return false;
+
+        }
+       
+        return true;
+    }
+    function Save() {
+        if (CheckField()) {
+            var url = "";
+            if (Datatype == 'N') {
+                url = '@Url.Content("~/CodeMag/Insert")';
+            }
+            else {
+                url = '@Url.Content("~/CodeMag/Update")';
+            }
+            var rowdata = {};
+            rowdata.idx = $('#hiddidx').val();
+            rowdata.AppName = $('#txtAppName').val();
+            rowdata.Acc = $('#txtAcc').val();
+            rowdata.Code = $('#txtCode').val();
+            rowdata.Code2 = $('#txtCode2').val();
+            rowdata.MemID = $("#ddlName").val();
+            $.ajax({
+                url: url,
+                type: 'POST',
+                dataType: 'json',
+                data: rowdata,
+                async: false,
+                cache: false,
+                success: function (data) {
+                    alert(data.Alert);
+                    Reload();
+                    $('#txtAppName').val('');
+                    $('#txtAcc').val(''); 
+                    $('#txtCode').val('');
+                    $('#txtCode2').val('');
+                    $('#divEdit').hide();
+                },
+                complete: function (data) {
+
+                }
+            });
+        }
+    }
+    $(function () {
+        $('#divEdit').hide();
+        $('#divMain').hide();
+        GetMem();
+        var TableOptions = {
+            //language: {
+            //    url: "@Url.Content("~/assets/js/datatables/tw.json")"
+            //},
+            //"dom": 'lrtip',
+            //iDisplayLength: 5,//每頁的行數
+            //serverSide: false,//分頁功能開啟，打開lengthChange
+            scrollX: true,
+            searching: false,
+            lengthChange: false,
+            processing: true,
+            serverSide: false,
+            order: [[0, 'asc']],
+            ajax: {
+                type: 'POST',
+                url: '@Url.Content("~/CodeMag/QueryJson")',
+                data: function (d) {
+                    d.uid = $("#ddlName").val();
+                }
+            },
+            columns: [
+                { 'title': '系統名稱', 'data': 'AppName' },
+                { 'title': '帳號', 'data': 'Acc' },
+                { 'title': '密碼', 'data': 'Code' },
+                { 'title': '密碼2', 'data': 'Code2' },
+                {
+                    'title': '維護', 'data': '', 'orderable': false, render: function (data, type, row) {
+                        var btnEdit = '<button class="btn btn-sm-block btn-primary ml-1" type="button" name="edit"><i class="ti-pencil"></i> 編輯</button>';
+                        var btnDel = '<button class="btn btn-sm-block btn-danger ml-1" type="button" name="del"><i class="ti-close"></i> 刪除</button>';
+                        return btnEdit + btnDel;
+
+                    }
+
+                }
+            ]
+        }
+
+        oTable = $('#tb').DataTable(TableOptions);
+        $('#tb tbody').on('click', 'button', function () {
+            var data = oTable.row($(this).parents('tr')).data();
+            if ($(this).attr('name') == 'edit') {
+                Update(data);
+            }
+            else {
+                Del(data);
+            }
+        });
+        $('#divEdit').hide();
+        $('#divMain').hide();
+    });
+    function Update(item) {
+        $('#divEdit').show();
+        Datatype = 'E'
+        $('#hiddidx').val(item.idx);
+        $('#txtAppName').val(item.AppName);
+        $('#txtAcc').val( item.Acc);
+        $('#txtCode').val(item.Code );
+        $('#txtCode2').val( item.Code2);
+
+    }
+    function Del(item) {
+        $.ajax({
+            url: '@Url.Content("~/CodeMag/Delete")',
+            type: 'POST',
+            dataType: 'json',
+            data: item,
+            async: false,
+            cache: false,
+            success: function (data) {
+                alert(data.Alert);
+                Reload();
+                $('#hiddidx').val('');
+               $('#txtAppName').val('');
+               $('#txtAcc').val('');
+               $('#txtCode').val('');
+               $('#txtCode2').val('');
+                $('#divEdit').hide();
+            },
+            complete: function (data) {
+
+            }
+        });
+    }
+</script>

@@ -10,10 +10,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
-//var settings = builder.Configuration.GetSection("ConnectionStrings").Get<AppSetting>();
+
 builder.Services.AddOptions();
 builder.Services.Configure<AppSetting>(
-    builder.Configuration.GetSection("ConnectionStrings"));
+builder.Configuration.GetSection("ConnectionStrings"));
 
 var app = builder.Build();
 
