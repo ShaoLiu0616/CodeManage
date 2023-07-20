@@ -8,44 +8,41 @@ namespace PSDMAG.Controllers
 {
     public class CodeMagController : Controller
     {
+        private ICodeMagService _CodeMagService;
         private readonly AppSetting _appSettings;
-        public CodeMagController(IOptions<AppSetting> options)
+        public CodeMagController(IOptions<AppSetting> options, ICodeMagService codeMagService)
         {
             _appSettings = options.Value;
+            _CodeMagService = codeMagService;
         }
         public IActionResult Index()
         {
             return View();
         }
         [HttpPost]
-        public IActionResult QueryJson(string uid) {
-
-            var CodeMagService = new CodeMagService();
-            var Result = CodeMagService.Query(_appSettings.LocalDB,uid);
+        public IActionResult QueryJson(string uid)
+        {
+            var Result = _CodeMagService.Query(uid);
             return Content(Result, "application/json");
         }
         [HttpPost]
         public IActionResult Insert(CodeMagActionRequest Request)
         {
-
-            var CodeMagService = new CodeMagService();
-            var Result = CodeMagService.Insert(_appSettings.LocalDB, Request);
+            var Result = _CodeMagService.Insert(Request);
             return Content(Result, "application/json");
         }
         [HttpPost]
         public IActionResult Update(CodeMagActionRequest Request)
         {
 
-            var CodeMagService = new CodeMagService();
-            var Result = CodeMagService.Update(_appSettings.LocalDB, Request);
+            var Result = _CodeMagService.Update(Request);
             return Content(Result, "application/json");
         }
         [HttpPost]
         public IActionResult Delete(CodeMagActionRequest Request)
         {
 
-            var CodeMagService = new CodeMagService();
-            var Result = CodeMagService.Delete(_appSettings.LocalDB, Request);
+            var Result = _CodeMagService.Delete(Request);
             return Content(Result, "application/json");
         }
     }

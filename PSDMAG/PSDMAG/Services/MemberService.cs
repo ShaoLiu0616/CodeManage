@@ -16,17 +16,24 @@ namespace PSDMAG.Services
    
     public interface IMemberService
     {
-        string Query(string Conn);
-        string Insert(string Conn, MemberActionRequest InsData);
-        string Update(string Conn, MemberActionRequest InsData);
-        string Delete(string Conn, MemberActionRequest InsData);
+        string Query();
+        string Insert(MemberActionRequest InsData);
+        string Update(MemberActionRequest InsData);
+        string Delete(MemberActionRequest InsData);
+        string GetMem();
+        string CheckMem(MemberActionRequest Request);
     }
     public class MemberService : IMemberService
     {
-        public string Query(string Conn)
+        private readonly AppSetting _appSettings;
+        public MemberService(IOptions<AppSetting> appSettings)
+        {
+            _appSettings = appSettings.Value;
+        }
+        public string Query()
         {
             var ConnectStringBulder = new SqliteConnectionStringBuilder();
-            ConnectStringBulder.DataSource = Conn;
+            ConnectStringBulder.DataSource = _appSettings.LocalDB;
             var Result = new List<Member>();
             using (var db =  new SqliteConnection(ConnectStringBulder.ConnectionString))
             {
@@ -64,12 +71,11 @@ namespace PSDMAG.Services
             idtc.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
             return JsonConvert.SerializeObject(result, Formatting.None, idtc);
         }
-        public string Insert(string Conn, MemberActionRequest InsData)
+        public string Insert(MemberActionRequest InsData)
         {
             var ExRes = 0;
             var ConnectStringBulder = new SqliteConnectionStringBuilder();
-            ConnectStringBulder.DataSource = Conn;
-            // ConnectStringBulder.DataSource = _appSettings.LocalDB;
+            ConnectStringBulder.DataSource = _appSettings.LocalDB;
             string Err = "";
             var salt = new Random().Next();
             var OK = encryption_sha512(InsData.Mpswd, salt.ToString().Substring(0,5));
@@ -111,12 +117,11 @@ namespace PSDMAG.Services
             idtc.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
             return JsonConvert.SerializeObject(result, Formatting.None, idtc);
         }
-        public string Update(string Conn, MemberActionRequest InsData)
+        public string Update(MemberActionRequest InsData)
         {
             var ExRes = 0;
             var ConnectStringBulder = new SqliteConnectionStringBuilder();
-            ConnectStringBulder.DataSource = Conn;
-            // ConnectStringBulder.DataSource = _appSettings.LocalDB;
+            ConnectStringBulder.DataSource = _appSettings.LocalDB;
             string Err = "";
             var salt = new Random().Next();
             var OK = encryption_sha512(InsData.Mpswd, salt.ToString().Substring(0, 5));
@@ -159,11 +164,11 @@ namespace PSDMAG.Services
             idtc.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
             return JsonConvert.SerializeObject(result, Formatting.None, idtc);
         }
-        public string Delete(string Conn, MemberActionRequest InsData)
+        public string Delete(MemberActionRequest InsData)
         {
             var ExRes = 0;
             var ConnectStringBulder = new SqliteConnectionStringBuilder();
-            ConnectStringBulder.DataSource = Conn;
+            ConnectStringBulder.DataSource = _appSettings.LocalDB;
             var Err = "";
             using (var db = new SqliteConnection(ConnectStringBulder.ConnectionString))
             {
@@ -201,11 +206,11 @@ namespace PSDMAG.Services
             idtc.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
             return JsonConvert.SerializeObject(result, Formatting.None, idtc);
         }
-        public string GetMem(string Conn)
+        public string GetMem()
         {
             var ExRes = 0;
             var ConnectStringBulder = new SqliteConnectionStringBuilder();
-            ConnectStringBulder.DataSource = Conn;
+            ConnectStringBulder.DataSource = _appSettings.LocalDB;
             var Err = "";
             var Result = new List<Member>();
             using (var db = new SqliteConnection(ConnectStringBulder.ConnectionString))
@@ -243,11 +248,11 @@ namespace PSDMAG.Services
             idtc.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
             return JsonConvert.SerializeObject(result, Formatting.None, idtc);
         }
-        public string CheckMem(string Conn, MemberActionRequest Request)
+        public string CheckMem(MemberActionRequest Request)
         {
             var ExRes = 0;
             var ConnectStringBulder = new SqliteConnectionStringBuilder();
-            ConnectStringBulder.DataSource = Conn;
+            ConnectStringBulder.DataSource = _appSettings.LocalDB;
             var Err = "";
             var pwd = "";
             var salt = "";

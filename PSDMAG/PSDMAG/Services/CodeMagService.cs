@@ -18,16 +18,22 @@ namespace PSDMAG.Services
    
     public interface ICodeMagService
     {
-       // string Query(string Conn,string Uid);
-        string Insert(string Conn, CodeMagActionRequest InsData);
-        string Update(string Conn, CodeMagActionRequest InsData);
+        string Query(string Uid);
+        string Insert(CodeMagActionRequest InsData);
+        string Update(CodeMagActionRequest InsData);
+        string Delete(CodeMagActionRequest InsData);
     }
     public class CodeMagService : ICodeMagService
     {
-        public string Query(string Conn, string Uid)
+        private readonly AppSetting _appSettings;
+        public CodeMagService(IOptions<AppSetting> appSettings)
+        {
+            _appSettings = appSettings.Value;
+        }
+        public string Query(string Uid)
         {
             var ConnectStringBulder = new SqliteConnectionStringBuilder();
-            ConnectStringBulder.DataSource = Conn;
+            ConnectStringBulder.DataSource = _appSettings.LocalDB;
             var Result = new List<CodeMag>();
             using (var db =  new SqliteConnection(ConnectStringBulder.ConnectionString))
             {
@@ -92,11 +98,11 @@ namespace PSDMAG.Services
             string resultText = System.Text.Encoding.UTF8.GetString(bytesDecode); // 還原 UTF8 字元
             return resultText;
         }
-        public string Insert(string Conn, CodeMagActionRequest InsData)
+        public string Insert(CodeMagActionRequest InsData)
         {
             var ExRes = 0;
             var ConnectStringBulder = new SqliteConnectionStringBuilder();
-            ConnectStringBulder.DataSource = Conn;
+            ConnectStringBulder.DataSource = _appSettings.LocalDB;
             // ConnectStringBulder.DataSource = _appSettings.LocalDB;
             string Err = "";
             var base642 = "";
@@ -143,11 +149,11 @@ namespace PSDMAG.Services
             idtc.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
             return JsonConvert.SerializeObject(result, Formatting.None, idtc);
         }
-        public string Update(string Conn, CodeMagActionRequest InsData)
+        public string Update(CodeMagActionRequest InsData)
         {
             var ExRes = 0;
             var ConnectStringBulder = new SqliteConnectionStringBuilder();
-            ConnectStringBulder.DataSource = Conn;
+            ConnectStringBulder.DataSource = _appSettings.LocalDB;
             string Err = "";
             var base642 = "";
             var base64 = StrToB64(InsData.Code);
@@ -195,11 +201,11 @@ namespace PSDMAG.Services
             idtc.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
             return JsonConvert.SerializeObject(result, Formatting.None, idtc);
         }
-        public string Delete(string Conn, CodeMagActionRequest InsData)
+        public string Delete(CodeMagActionRequest InsData)
         {
             var ExRes = 0;
             var ConnectStringBulder = new SqliteConnectionStringBuilder();
-            ConnectStringBulder.DataSource = Conn;
+            ConnectStringBulder.DataSource = _appSettings.LocalDB;
             var Err = "";
             using (var db = new SqliteConnection(ConnectStringBulder.ConnectionString))
             {

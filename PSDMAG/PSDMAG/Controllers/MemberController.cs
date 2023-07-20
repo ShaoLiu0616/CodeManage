@@ -9,59 +9,50 @@ namespace PSDMAG.Controllers
     public class MemberController : Controller
     {
         private readonly AppSetting _appSettings;
-        public MemberController(IOptions<AppSetting> options)
+        private IMemberService _MemberService;
+        public MemberController(IOptions<AppSetting> options, IMemberService memberService)
         {
             _appSettings = options.Value;
+            _MemberService = memberService;
         }
         public IActionResult Index()
         {
             return View();
         }
         [HttpPost]
-        public IActionResult QueryJson() {
-
-            var MemberService = new MemberService();
-            var Result = MemberService.Query(_appSettings.LocalDB);
+        public IActionResult QueryJson()
+        {
+            var Result = _MemberService.Query();
             return Content(Result, "application/json");
         }
         [HttpPost]
         public IActionResult Insert(MemberActionRequest Request)
         {
-
-            var MemberService = new MemberService();
-            var Result = MemberService.Insert(_appSettings.LocalDB, Request);
+            var Result = _MemberService.Insert(Request);
             return Content(Result, "application/json");
         }
         [HttpPost]
         public IActionResult Update(MemberActionRequest Request)
         {
-
-            var MemberService = new MemberService();
-            var Result = MemberService.Update(_appSettings.LocalDB, Request);
+            var Result = _MemberService.Update(Request);
             return Content(Result, "application/json");
         }
         [HttpPost]
         public IActionResult Delete(MemberActionRequest Request)
         {
-
-            var MemberService = new MemberService();
-            var Result = MemberService.Delete(_appSettings.LocalDB, Request);
+            var Result = _MemberService.Delete(Request);
             return Content(Result, "application/json");
         }
         [HttpPost]
         public IActionResult GetMem()
         {
-
-            var MemberService = new MemberService();
-            var Result = MemberService.GetMem(_appSettings.LocalDB);
+            var Result = _MemberService.GetMem();
             return Content(Result, "application/json");
         }
         [HttpPost]
         public IActionResult CheckMem(MemberActionRequest Request)
         {
-
-            var MemberService = new MemberService();
-            var Result = MemberService.CheckMem(_appSettings.LocalDB , Request);
+            var Result = _MemberService.CheckMem(Request);
             return Content(Result, "application/json");
         }
     }

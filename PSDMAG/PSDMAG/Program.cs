@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
 using PSDMAG.Models;
+using PSDMAG.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +15,9 @@ builder.Services.AddRazorPages();
 builder.Services.AddOptions();
 builder.Services.Configure<AppSetting>(
 builder.Configuration.GetSection("ConnectionStrings"));
+
+builder.Services.AddScoped<IMemberService, MemberService>();
+builder.Services.AddScoped<ICodeMagService, CodeMagService>();
 
 var app = builder.Build();
 
